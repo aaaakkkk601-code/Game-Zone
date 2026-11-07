@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071b19">
+<title>GAME ZONE — My Games</title>
+<style>
+:root{--bg:#071b19;--panel:#102c29;--panel2:#153a35;--green:#70f5b2;--blue:#75ddfb;--muted:#a8c7be}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#123b34 0,#071b19 48%,#06131b 100%);color:#f5fffb;font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 18px;border-bottom:1px solid #28564b;background:#071b19cc;position:sticky;top:0;backdrop-filter:blur(8px);z-index:2}
+.wrap{width:min(100% - 32px,980px);margin:auto}
+.brand{font-size:27px;font-weight:900;letter-spacing:2px;color:var(--green);text-shadow:0 0 18px #38d99577}
+.brand span{color:var(--blue)}
+nav{float:right;margin-top:7px;color:var(--muted);font-size:13px}
+.hero{padding:55px 0 35px;text-align:center}
+.kicker{color:var(--blue);letter-spacing:4px;font-size:12px;font-weight:bold}
+h1{font-size:clamp(38px,9vw,68px);margin:12px 0;color:var(--green);text-shadow:0 0 24px #38d99566}
+.hero p{color:var(--muted);font-size:16px;line-height:1.6;margin:0 auto;max-width:540px}
+.section-title{font-size:23px;margin:20px 0 15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;padding-bottom:34px}
+.card{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid #367866;border-radius:20px;padding:18px;box-shadow:0 12px 30px #0004}
+.game-icon{height:125px;border-radius:14px;background:linear-gradient(135deg,#174a3e,#123b50);display:grid;place-items:center;font-size:54px;margin-bottom:15px}
+.card h3{margin:0 0 7px;font-size:19px}
+.card p{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.5}
+button{border:0;border-radius:12px;background:var(--green);color:#06251a;font-weight:800;padding:13px 17px;font-size:14px;cursor:pointer}
+button.secondary{background:#245a58;color:#fff}
+.game-area{display:none;margin:0 0 35px;background:#0d2926;border:1px solid #367866;border-radius:20px;padding:18px}
+.game-area.active{display:block}
+.game-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.status{background:#173b37;color:var(--green);padding:12px 15px;border-radius:12px;margin:16px 0;font-weight:bold;text-align:center}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:390px;margin:auto}
+.cell{aspect-ratio:1;border:1px solid #398b73;border-radius:15px;background:linear-gradient(145deg,#204d43,#173d3d);color:var(--green);font-size:clamp(40px,12vw,58px);font-weight:bold}
+.cell.o{color:var(--blue);text-shadow:0 0 15px var(--blue)}
+.cell.x{ text-shadow:0 0 15px var(--green)}
+.cell.win{background:#267a57;border:2px solid var(--green)}
+.actions{display:flex;gap:10px;max-width:390px;margin:16px auto 0}
+.actions button{flex:1}
+footer{text-align:center;border-top:1px solid #28564b;padding:22px;color:#86aa9f;font-size:12px}
+@media(max-width:560px){nav{display:none}.hero{padding-top:42px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">GAME <span>ZONE</span></div><nav>MY GAMES</nav></div></header>
+<main class="wrap">
+<section class="hero">
+<div class="kicker">YOUR GAMES. YOUR WORLD.</div>
+<h1>GAME ZONE</h1>
+<p>स्वागत है! यहाँ मेरे बनाए हुए गेम मिलेंगे। नए गेम बनते ही इसी वेबसाइट पर जोड़े जाएँगे।</p>
+</section>
+<h2 class="section-title">मेरे गेम</h2>
+<section class="grid" aria-label="मेरे गेम">
+<article class="card">
+<div class="game-icon">⭕❌</div>
+<h3>Tic Tac Toe — Neon Edition</h3>
+<p>दो खिलाड़ी बारी-बारी से X और O खेलें।</p>
+<button onclick="openGame()">PLAY GAME</button>
+</article>
+</section>
+<section class="game-area" id="gameArea">
+<div class="game-top"><h2 style="margin:0">Tic Tac Toe — Neon Edition</h2><button class="secondary" onclick="closeGame()">BACK</button></div>
+<div class="status" id="status">PLAYER X TURN</div>
+<div class="board" id="board"></div>
+<div class="actions"><button onclick="resetGame()">NEW GAME</button><button class="secondary" onclick="resetGame()">RESET</button></div>
+</section>
+</main>
+<footer>© GAME ZONE · केवल मेरे बनाए हुए गेम</footer>
+<script>
+let cells=["","","","","","","","",""],current="X",over=false;
+const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function draw(){const el=document.getElementById("board");el.innerHTML="";cells.forEach((v,i)=>{const b=document.createElement("button");b.className="cell "+v.toLowerCase();b.textContent=v;b.setAttribute("aria-label","Cell "+(i+1));b.onclick=()=>play(i);el.appendChild(b)})}
+function play(i){if(cells[i]||over)return;cells[i]=current;const line=wins.find(row=>row.every(n=>cells[n]===current));if(line){over=true;document.getElementById("status").textContent="🎉 PLAYER "+current+" WINS!";draw();line.forEach(n=>document.querySelectorAll(".cell")[n].classList.add("win"));return}if(cells.every(Boolean)){over=true;document.getElementById("status").textContent="IT'S A DRAW!";draw();return}current=current==="X"?"O":"X";document.getElementById("status").textContent="PLAYER "+current+" TURN";draw()}
+function resetGame(){cells=["","","","","","","","",""];current="X";over=false;document.getElementById("status").textContent="PLAYER X TURN";draw()}
+function openGame(){document.getElementById("gameArea").classList.add("active");document.getElementById("gameArea").scrollIntoView({behavior:"smooth"});draw()}
+function closeGame(){document.getElementById("gameArea").classList.remove("active");window.scrollTo({top:0,behavior:"smooth"})}
+draw();
+</script>
+</body>
+</html>
